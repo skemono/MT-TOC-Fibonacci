@@ -1,0 +1,140 @@
+{
+  "nombre": "maquina_fibonacci",
+  "descripcion": "Máquina de Turing Fibonacci - N>=0. Logic: Base cases (0,1,2) explicitly handled. N>=3 uses loop: count inputs, copy last 2 blocks to end, cleanup.",
+  "simbolo_blanco": "B",
+  "alfabeto_entrada": ["1", "B"],
+  "alfabeto_cinta": ["1", "B", "X", "A", "#", "S", "2"],
+  "estado_inicial": "q0",
+  "estados_aceptacion": ["q_accept"],
+  "estados": [
+    "q0", "q_check0", "q_check1", "q_check2", "q_n1_restore", "q_n2_back1", "q_n2_back2",
+    "q_mark_S_0", "q_mark_S_1", "q_mark_S_2", "q_init_scan_end",
+    "q_init_write_sep1", "q_init_write_t1", "q_init_write_sep2", "q_init_write_t2",
+    "q_return_to_count_scan", "q_scan_to_count_start", "q_check_count",
+    "q_sum_start_append",
+    "q_sum_find_t2_start", "q_sum_check_t2_start",
+    "q_copy_scan", "q_copy_transport", "q_copy_restore", "q_copy_finished_block", "q_restore_2",
+    "q_seek_next_block",
+    "q_sum_return_count", "q_return_restore_X", "q_return_restore_S_fix", "q_return_restore_S_fix2",
+    "q_cleanup_init", "q_cleanup_find_result_start", "q_cleanup_mark_next_copy",
+    "q_cleanup_transport_1_start", "q_cleanup_place_1", "q_cleanup_place_S",
+    "q_cleanup_return_to_source", "q_cleanup_erase_rest", "q_cleanup_finish"
+  ],
+  "transiciones": [
+    {"estado_actual": "q0", "simbolo_leido": "B", "estado_siguiente": "q_accept", "simbolo_escrito": "B", "movimiento": "R"},
+    {"estado_actual": "q0", "simbolo_leido": "1", "estado_siguiente": "q_check0", "simbolo_escrito": "B", "movimiento": "R"},
+
+    {"estado_actual": "q_check0", "simbolo_leido": "B", "estado_siguiente": "q_n1_restore", "simbolo_escrito": "B", "movimiento": "L"},
+    {"estado_actual": "q_check0", "simbolo_leido": "1", "estado_siguiente": "q_check1", "simbolo_escrito": "B", "movimiento": "R"},
+    {"estado_actual": "q_n1_restore", "simbolo_leido": "B", "estado_siguiente": "q_accept", "simbolo_escrito": "1", "movimiento": "R"},
+
+    {"estado_actual": "q_check1", "simbolo_leido": "B", "estado_siguiente": "q_n2_back1", "simbolo_escrito": "B", "movimiento": "L"},
+    {"estado_actual": "q_check1", "simbolo_leido": "1", "estado_siguiente": "q_check2", "simbolo_escrito": "1", "movimiento": "R"},
+    {"estado_actual": "q_n2_back1", "simbolo_leido": "B", "estado_siguiente": "q_n2_back2", "simbolo_escrito": "B", "movimiento": "L"},
+    {"estado_actual": "q_n2_back2", "simbolo_leido": "B", "estado_siguiente": "q_accept", "simbolo_escrito": "1", "movimiento": "R"},
+
+    {"estado_actual": "q_check2", "simbolo_leido": "1", "estado_siguiente": "q_mark_S_0", "simbolo_escrito": "1", "movimiento": "L"},
+    {"estado_actual": "q_check2", "simbolo_leido": "B", "estado_siguiente": "q_mark_S_0", "simbolo_escrito": "B", "movimiento": "L"},
+
+    {"estado_actual": "q_mark_S_0", "simbolo_leido": "1", "estado_siguiente": "q_mark_S_0", "simbolo_escrito": "1", "movimiento": "L"},
+    {"estado_actual": "q_mark_S_0", "simbolo_leido": "B", "estado_siguiente": "q_mark_S_1", "simbolo_escrito": "S", "movimiento": "R"},
+    
+    {"estado_actual": "q_mark_S_1", "simbolo_leido": "1", "estado_siguiente": "q_init_scan_end", "simbolo_escrito": "1", "movimiento": "R"},
+    {"estado_actual": "q_mark_S_1", "simbolo_leido": "B", "estado_siguiente": "q_init_scan_end", "simbolo_escrito": "B", "movimiento": "R"},
+
+    {"estado_actual": "q_init_scan_end", "simbolo_leido": "1", "estado_siguiente": "q_init_scan_end", "simbolo_escrito": "1", "movimiento": "R"},
+    {"estado_actual": "q_init_scan_end", "simbolo_leido": "B", "estado_siguiente": "q_init_write_sep1", "simbolo_escrito": "#", "movimiento": "R"},
+
+    {"estado_actual": "q_init_write_sep1", "simbolo_leido": "B", "estado_siguiente": "q_init_write_t1", "simbolo_escrito": "1", "movimiento": "R"},
+    {"estado_actual": "q_init_write_t1", "simbolo_leido": "B", "estado_siguiente": "q_init_write_sep2", "simbolo_escrito": "#", "movimiento": "R"},
+    {"estado_actual": "q_init_write_sep2", "simbolo_leido": "B", "estado_siguiente": "q_init_write_t2", "simbolo_escrito": "1", "movimiento": "R"},
+    {"estado_actual": "q_init_write_t2", "simbolo_leido": "B", "estado_siguiente": "q_return_to_count_scan", "simbolo_escrito": "1", "movimiento": "L"},
+
+    {"estado_actual": "q_return_to_count_scan", "simbolo_leido": "1", "estado_siguiente": "q_return_to_count_scan", "simbolo_escrito": "1", "movimiento": "L"},
+    {"estado_actual": "q_return_to_count_scan", "simbolo_leido": "#", "estado_siguiente": "q_return_to_count_scan", "simbolo_escrito": "#", "movimiento": "L"},
+    {"estado_actual": "q_return_to_count_scan", "simbolo_leido": "B", "estado_siguiente": "q_return_to_count_scan", "simbolo_escrito": "B", "movimiento": "L"},
+    {"estado_actual": "q_return_to_count_scan", "simbolo_leido": "X", "estado_siguiente": "q_return_to_count_scan", "simbolo_escrito": "X", "movimiento": "L"},
+    {"estado_actual": "q_return_to_count_scan", "simbolo_leido": "S", "estado_siguiente": "q_check_count", "simbolo_escrito": "S", "movimiento": "R"},
+
+    {"estado_actual": "q_check_count", "simbolo_leido": "B", "estado_siguiente": "q_accept", "simbolo_escrito": "B", "movimiento": "R"},
+    {"estado_actual": "q_check_count", "simbolo_leido": "X", "estado_siguiente": "q_check_count", "simbolo_escrito": "X", "movimiento": "R"},
+    {"estado_actual": "q_check_count", "simbolo_leido": "S", "estado_siguiente": "q_check_count", "simbolo_escrito": "S", "movimiento": "R"},
+    {"estado_actual": "q_check_count", "simbolo_leido": "1", "estado_siguiente": "q_sum_start_append", "simbolo_escrito": "X", "movimiento": "R"},
+    {"estado_actual": "q_check_count", "simbolo_leido": "#", "estado_siguiente": "q_accept", "simbolo_escrito": "#", "movimiento": "R"},
+    
+    {"estado_actual": "q_skip_first_two", "simbolo_leido": "1", "estado_siguiente": "q_sum_start_append", "simbolo_escrito": "X", "movimiento": "R"},
+    {"estado_actual": "q_skip_first_two", "simbolo_leido": "B", "estado_siguiente": "q_accept", "simbolo_escrito": "B", "movimiento": "R"},
+    {"estado_actual": "q_skip_first_two", "simbolo_leido": "#", "estado_siguiente": "q_accept", "simbolo_escrito": "#", "movimiento": "R"},
+
+    {"estado_actual": "q_sum_start_append", "simbolo_leido": "1", "estado_siguiente": "q_sum_start_append", "simbolo_escrito": "1", "movimiento": "R"},
+    {"estado_actual": "q_sum_start_append", "simbolo_leido": "#", "estado_siguiente": "q_sum_start_append", "simbolo_escrito": "#", "movimiento": "R"},
+    {"estado_actual": "q_sum_start_append", "simbolo_leido": "B", "estado_siguiente": "q_sum_find_t2_start", "simbolo_escrito": "#", "movimiento": "L"},
+
+    {"estado_actual": "q_sum_find_t2_start", "simbolo_leido": "#", "estado_siguiente": "q_sum_check_t2_start", "simbolo_escrito": "2", "movimiento": "L"},
+    {"estado_actual": "q_sum_find_t2_start", "simbolo_leido": "1", "estado_siguiente": "q_sum_find_t2_start", "simbolo_escrito": "1", "movimiento": "L"},
+    
+    {"estado_actual": "q_sum_check_t2_start", "simbolo_leido": "1", "estado_siguiente": "q_sum_check_t2_start", "simbolo_escrito": "1", "movimiento": "L"},
+    {"estado_actual": "q_sum_check_t2_start", "simbolo_leido": "#", "estado_siguiente": "q_copy_scan", "simbolo_escrito": "#", "movimiento": "R"},
+    {"estado_actual": "q_sum_check_t2_start", "simbolo_leido": "S", "estado_siguiente": "q_copy_scan", "simbolo_escrito": "S", "movimiento": "R"},
+    
+    {"estado_actual": "q_copy_scan", "simbolo_leido": "1", "estado_siguiente": "q_copy_transport", "simbolo_escrito": "A", "movimiento": "R"},
+    {"estado_actual": "q_copy_scan", "simbolo_leido": "A", "estado_siguiente": "q_copy_scan", "simbolo_escrito": "A", "movimiento": "R"},
+    {"estado_actual": "q_copy_scan", "simbolo_leido": "#", "estado_siguiente": "q_seek_next_block", "simbolo_escrito": "#", "movimiento": "R"},
+    {"estado_actual": "q_copy_scan", "simbolo_leido": "2", "estado_siguiente": "q_copy_finished_block", "simbolo_escrito": "2", "movimiento": "R"},
+    {"estado_actual": "q_copy_scan", "simbolo_leido": "B", "estado_siguiente": "q_sum_return_count", "simbolo_escrito": "B", "movimiento": "L"},
+
+    {"estado_actual": "q_copy_transport", "simbolo_leido": "1", "estado_siguiente": "q_copy_transport", "simbolo_escrito": "1", "movimiento": "R"},
+    {"estado_actual": "q_copy_transport", "simbolo_leido": "2", "estado_siguiente": "q_copy_transport", "simbolo_escrito": "2", "movimiento": "R"},
+    {"estado_actual": "q_copy_transport", "simbolo_leido": "#", "estado_siguiente": "q_copy_transport", "simbolo_escrito": "#", "movimiento": "R"},
+    {"estado_actual": "q_copy_transport", "simbolo_leido": "B", "estado_siguiente": "q_copy_restore", "simbolo_escrito": "1", "movimiento": "L"},
+
+    {"estado_actual": "q_copy_restore", "simbolo_leido": "1", "estado_siguiente": "q_copy_restore", "simbolo_escrito": "1", "movimiento": "L"},
+    {"estado_actual": "q_copy_restore", "simbolo_leido": "2", "estado_siguiente": "q_copy_restore", "simbolo_escrito": "2", "movimiento": "L"},
+    {"estado_actual": "q_copy_restore", "simbolo_leido": "#", "estado_siguiente": "q_copy_restore", "simbolo_escrito": "#", "movimiento": "L"},
+    {"estado_actual": "q_copy_restore", "simbolo_leido": "A", "estado_siguiente": "q_copy_scan", "simbolo_escrito": "1", "movimiento": "R"},
+
+    {"estado_actual": "q_seek_next_block", "simbolo_leido": "1", "estado_siguiente": "q_copy_scan", "simbolo_escrito": "1", "movimiento": "R"},
+    
+    {"estado_actual": "q_copy_finished_block", "simbolo_leido": "B", "estado_siguiente": "q_restore_2", "simbolo_escrito": "B", "movimiento": "L"},
+    {"estado_actual": "q_copy_finished_block", "simbolo_leido": "1", "estado_siguiente": "q_restore_2", "simbolo_escrito": "1", "movimiento": "L"},
+    
+    {"estado_actual": "q_restore_2", "simbolo_leido": "2", "estado_siguiente": "q_sum_return_count", "simbolo_escrito": "#", "movimiento": "L"},
+
+    {"estado_actual": "q_sum_return_count", "simbolo_leido": "1", "estado_siguiente": "q_sum_return_count", "simbolo_escrito": "1", "movimiento": "L"},
+    {"estado_actual": "q_sum_return_count", "simbolo_leido": "#", "estado_siguiente": "q_sum_return_count", "simbolo_escrito": "#", "movimiento": "L"},
+    {"estado_actual": "q_sum_return_count", "simbolo_leido": "X", "estado_siguiente": "q_check_count", "simbolo_escrito": "X", "movimiento": "R"},
+    {"estado_actual": "q_sum_return_count", "simbolo_leido": "S", "estado_siguiente": "q_check_count", "simbolo_escrito": "S", "movimiento": "R"},
+
+    {"estado_actual": "q_return_restore_X", "simbolo_leido": "1", "estado_siguiente": "q_check_count", "simbolo_escrito": "1", "movimiento": "R"},
+    {"estado_actual": "q_return_restore_X", "simbolo_leido": "#", "estado_siguiente": "q_check_count", "simbolo_escrito": "#", "movimiento": "R"},
+    {"estado_actual": "q_return_restore_X", "simbolo_leido": "X", "estado_siguiente": "q_check_count", "simbolo_escrito": "X", "movimiento": "R"},
+    
+    {"estado_actual": "q_return_restore_S_fix", "simbolo_leido": "B", "estado_siguiente": "q_return_restore_S_fix2", "simbolo_escrito": "B", "movimiento": "R"},
+    {"estado_actual": "q_return_restore_S_fix", "simbolo_leido": "X", "estado_siguiente": "q_check_count", "simbolo_escrito": "X", "movimiento": "R"},
+    
+    {"estado_actual": "q_return_restore_S_fix2", "simbolo_leido": "X", "estado_siguiente": "q_check_count", "simbolo_escrito": "X", "movimiento": "R"},
+    {"estado_actual": "q_return_restore_S_fix2", "simbolo_leido": "1", "estado_siguiente": "q_check_count", "simbolo_escrito": "1", "movimiento": "R"},
+    {"estado_actual": "q_return_restore_S_fix2", "simbolo_leido": "#", "estado_siguiente": "q_check_count", "simbolo_escrito": "#", "movimiento": "R"},
+
+
+    {"estado_actual": "q_cleanup_init", "simbolo_leido": "B", "estado_siguiente": "q_cleanup_find_end", "simbolo_escrito": "B", "movimiento": "R"},
+    {"estado_actual": "q_cleanup_init", "simbolo_leido": "1", "estado_siguiente": "q_cleanup_init", "simbolo_escrito": "1", "movimiento": "R"},
+    {"estado_actual": "q_cleanup_init", "simbolo_leido": "#", "estado_siguiente": "q_cleanup_init", "simbolo_escrito": "#", "movimiento": "R"},
+    {"estado_actual": "q_cleanup_init", "simbolo_leido": "X", "estado_siguiente": "q_cleanup_init", "simbolo_escrito": "X", "movimiento": "R"},
+    {"estado_actual": "q_cleanup_init", "simbolo_leido": "S", "estado_siguiente": "q_cleanup_init", "simbolo_escrito": "S", "movimiento": "R"},
+
+    {"estado_actual": "q_cleanup_find_end", "simbolo_leido": "1", "estado_siguiente": "q_cleanup_find_end", "simbolo_escrito": "1", "movimiento": "R"},
+    {"estado_actual": "q_cleanup_find_end", "simbolo_leido": "#", "estado_siguiente": "q_cleanup_find_end", "simbolo_escrito": "#", "movimiento": "R"},
+    {"estado_actual": "q_cleanup_find_end", "simbolo_leido": "B", "estado_siguiente": "q_cleanup_restore_last_block", "simbolo_escrito": "B", "movimiento": "L"},
+
+    {"estado_actual": "q_cleanup_restore_last_block", "simbolo_leido": "1", "estado_siguiente": "q_cleanup_restore_last_block", "simbolo_escrito": "1", "movimiento": "L"},
+    {"estado_actual": "q_cleanup_restore_last_block", "simbolo_leido": "#", "estado_siguiente": "q_cleanup_erase_left_loop", "simbolo_escrito": "B", "movimiento": "L"},
+    {"estado_actual": "q_cleanup_restore_last_block", "simbolo_leido": "B", "estado_siguiente": "q_cleanup_restore_last_block", "simbolo_escrito": "B", "movimiento": "L"},
+
+    {"estado_actual": "q_cleanup_erase_left_loop", "simbolo_leido": "1", "estado_siguiente": "q_cleanup_erase_left_loop", "simbolo_escrito": "B", "movimiento": "L"},
+    {"estado_actual": "q_cleanup_erase_left_loop", "simbolo_leido": "#", "estado_siguiente": "q_cleanup_erase_left_loop", "simbolo_escrito": "B", "movimiento": "L"},
+    {"estado_actual": "q_cleanup_erase_left_loop", "simbolo_leido": "X", "estado_siguiente": "q_cleanup_erase_left_loop", "simbolo_escrito": "B", "movimiento": "L"},
+    {"estado_actual": "q_cleanup_erase_left_loop", "simbolo_leido": "S", "estado_siguiente": "q_cleanup_erase_left_loop", "simbolo_escrito": "B", "movimiento": "L"},
+    {"estado_actual": "q_cleanup_erase_left_loop", "simbolo_leido": "B", "estado_siguiente": "q_accept", "simbolo_escrito": "B", "movimiento": "R"}
+  ]
+}

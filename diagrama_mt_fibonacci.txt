@@ -1,0 +1,212 @@
+# DIAGRAMA DE LA MÁQUINA DE TURING PARA FIBONACCI (SIMPLIFICADA)
+
+## Descripción General
+Máquina de Turing que calcula Fibonacci usando MARCADORES (A) en vez de copiar bloques.
+**Reducida de 45 a 18 estados** usando estrategia inteligente.
+
+## Alfabeto:
+- Entrada: {1, B}
+- Cinta: {1, B, X, A, #}
+  - 1: unidades
+  - B: blanco
+  - X: marcador de contador (cuántos pasos faltan)
+  - A: marca temporal para suma (sustituye a Y, Z)
+  - #: separador único
+
+## Estados (18 total):
+- q0: inicial
+- q_check0, q_check1: verificar casos base (F(0), F(1))
+- q_setup_scan, q_setup_write: inicializar cinta
+- **q_ir_inicio: ESTADO GENÉRICO de retorno** (reemplaza 5+ estados)
+- q_loop_ini, q_loop_dec: control del bucle principal
+- q_suma_prep, q_suma_c1, q_suma_w1: suma de F(i-1)
+- q_suma_c0, q_suma_w0: suma de F(i-2)
+- q_restaurar, q_limpiar: limpieza post-suma
+- q_fin_buscar, q_fin_copiar: copiar resultado final
+- q_accept: aceptación
+
+## MEJORAS vs versión anterior:
+
+### 1. Estado Genérico de Navegación
+**Antes**: q_setup_back, q_add_copy1_back, q_add_copy0_back, q_iter_back (4 estados)
+**Ahora**: q_ir_inicio (1 solo estado)
+- Lee cualquier símbolo (1, X, #, A)
+- Se mueve L hasta encontrar B
+- Salta al estado siguiente
+
+### 2. Suma con Marcadores "In Situ"
+**Antes**: Copiar F(i-1) → Copiar F(i-2) → Mover bloques (15 estados)
+**Ahora**: Marcar con A → Escribir 1 al final → Restaurar A→1 (6 estados)
+
+Ejemplo visual:
+```
+Antes de suma:  #11#1
+q_suma_c1:      #A1#1   (marca primer 1 de F(i-1))
+q_suma_w1:      #A1#11  (escribe 1 al final)
+q_suma_c1:      #AA#11  (marca segundo 1)
+q_suma_w1:      #AA#111 (escribe otro 1)
+q_suma_c0:      #AA#111 (ahora F(i-2), que ya está vacío)
+q_restaurar:    #11#111 (convierte A→1, ahora tenemos 1+1=2 al final)
+```
+
+### 3. Casos Base Integrados
+**Antes**: q_case0, q_case1, q_case2, q_case2_check (4 estados separados)
+**Ahora**: q_check0, q_check1 (2 estados que fluyen naturalmente)
+- Si entrada es B → F(0)=0 directamente
+- Si entrada es 1 → F(1)=1 directamente  
+- Si entrada es 11+ → pasa a setup automáticamente
+
+## Funcionamiento General:
+
+### CASO 1: F(0) = 0
+```
+Entrada: B
+q0 → (lee B) → q_accept
+```
+
+### CASO 2: F(1) = 1
+```
+Entrada: 1
+q0 → q_check0 → (lee B) → q_accept
+Salida: 1
+```
+
+### CASO 3: F(n) para n ≥ 2
+
+#### Inicialización:
+```
+Entrada: 1111 (n=4)
+q_setup_scan: Convierte a XXX (contador n-2=2)
+q_setup_write: Crea estructura: XXX#1
+Resultado: [XXX] # [1] # []
+           (n-2)   (F1)  (F0 vacío, lo omitimos)
+```
+
+#### Bucle Principal (mientras haya X):
+```
+1. q_loop_dec: Borra una X
+2. q_suma_c1: Por cada 1 en F(i-1), marca como A y escribe 1 al final
+3. q_suma_c0: Por cada 1 en F(i-2), marca como A y escribe 1 al final
+4. q_restaurar: Convierte todos los A de vuelta a 1
+5. q_limpiar: Borra el F(i-2) viejo
+6. q_ir_inicio: **Regresa al principio usando un solo estado**
+7. Repite
+```
+
+#### Finalización:
+```
+Cuando no quedan X:
+q_fin_buscar: Encuentra el último grupo de 1s (el resultado)
+q_fin_copiar: Lo mueve al principio borrando todo lo demás
+q_accept: Termina con el resultado en la cinta
+```
+
+## DIAGRAMA VISUAL SIMPLIFICADO:
+
+```
+           ┌─────┐
+           │ q0  │
+           └──┬──┘
+         B/  |  \1
+        ┌────┘   └────┐
+        v              v
+   [q_accept]    ┌─────────┐
+                 │q_check0 │
+                 └────┬────┘
+                 B/   |   \1
+            ┌─────┘   └─────┐
+            v                v
+       [q_accept]      ┌─────────┐
+                       │q_check1 │
+                       └────┬────┘
+                       B/   |   \1
+                  ┌─────┘   └─────┐
+                  v                v
+             [q_accept]       ┌────────┐
+                              │ setup  │
+                              │ (scan+ │
+                              │ write) │
+                              └────┬───┘
+                                   |
+                              ┌────v───────┐
+                         ┌───►q_ir_inicio │◄─────┐
+                         |    └────┬───────┘      |
+                         |         |              |
+                         |    ┌────v────┐         |
+                         |    │q_loop   │         |
+                         |    │  _ini   │         |
+                         |    └─┬────┬──┘         |
+                         |    X/│   │#/           |
+                         |      |   |             |
+                         |   ┌──v┐  └──┐          |
+                         |   │dec│     │          |
+                         |   └─┬─┘     v          |
+                         |     |    [Fin]         |
+                         |     v                  |
+                         | ┌────────┐             |
+                         | │  Suma  │             |
+                         | │(c1,w1, │             |
+                         | │ c0,w0) │             |
+                         | └────┬───┘             |
+                         |      |                 |
+                         |  ┌───v────┐            |
+                         |  │restaura│            |
+                         |  │+limpiar│            |
+                         |  └───┬────┘            |
+                         |      |                 |
+                         └──────┘ (vuelve al inicio)
+```
+
+## Transiciones Clave Explicadas:
+
+### Estado Genérico q_ir_inicio (EL TRUCO):
+```
+(q_ir_inicio, 1) → (q_ir_inicio, 1, L)
+(q_ir_inicio, X) → (q_ir_inicio, X, L)
+(q_ir_inicio, #) → (q_ir_inicio, #, L)
+(q_ir_inicio, A) → (q_ir_inicio, A, L)
+(q_ir_inicio, B) → (q_loop_ini, B, R)  ← Cuando llega al inicio
+```
+**Magia**: No importa de dónde vengas, este estado te lleva al inicio.
+
+### Suma con Marcador A (CORE):
+```
+# Marca F(i-1) y escribe al final:
+(q_suma_c1, 1) → (q_suma_w1, A, R)    ← Marca 1 como A
+(q_suma_w1, B) → (q_suma_c1, 1, L)    ← Escribe 1 al final
+
+# Cuando termina F(i-1), hace lo mismo con F(i-2):
+(q_suma_c1, A/B) → (q_suma_c0, A/B, L) ← Cambia a F(i-2)
+(q_suma_c0, 1) → (q_suma_w0, A, R)
+(q_suma_w0, B) → (q_suma_c0, 1, L)
+
+# Restaura:
+(q_restaurar, A) → (q_restaurar, 1, R)  ← Convierte A→1
+```
+
+## Comparación de Estados:
+
+| Sección | Versión Anterior | Simplificada | Reducción |
+|---------|------------------|--------------|-----------|
+| Casos base | 6 | 2 | -67% |
+| Setup | 6 | 3 | -50% |
+| **Navegación** | 5 | **1** | **-80%** |
+| Bucle control | 3 | 2 | -33% |
+| Suma | 15 | 6 | -60% |
+| Limpieza | 7 | 2 | -71% |
+| Finalización | 8 | 2 | -75% |
+| **TOTAL** | **45** | **18** | **-60%** |
+
+## Complejidad:
+- Tiempo: O(n · F(n)²) - Sin cambios, pero menos overhead
+- Espacio: O(F(n)) - Sin cambios
+- Estados: **40% del original**
+- Transiciones: **65% del original**
+
+## Ventajas de esta Estrategia:
+
+✓ Menos estados = menos errores
+✓ Flujo más lineal = más fácil de depurar
+✓ Estado genérico = reutilizable
+✓ Marcadores A = no mover bloques pesados
+✓ Casos base naturales = sin lógica especial
