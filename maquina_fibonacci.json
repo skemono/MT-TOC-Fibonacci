@@ -8,17 +8,15 @@
   "estados_aceptacion": ["q_accept"],
   "estados": [
     "q0", "q_check0", "q_check1", "q_check2", "q_n1_restore", "q_n2_back1", "q_n2_back2",
-    "q_mark_S_0", "q_mark_S_1", "q_mark_S_2", "q_init_scan_end",
+    "q_mark_S_0", "q_mark_S_1", "q_init_scan_end",
     "q_init_write_sep1", "q_init_write_t1", "q_init_write_sep2", "q_init_write_t2",
-    "q_return_to_count_scan", "q_scan_to_count_start", "q_check_count",
+    "q_return_to_count_scan", "q_check_count",
     "q_sum_start_append",
     "q_sum_find_t2_start", "q_sum_check_t2_start",
     "q_copy_scan", "q_copy_transport", "q_copy_restore", "q_copy_finished_block", "q_restore_2",
     "q_seek_next_block",
     "q_sum_return_count", "q_return_restore_X", "q_return_restore_S_fix", "q_return_restore_S_fix2",
-    "q_cleanup_init", "q_cleanup_find_result_start", "q_cleanup_mark_next_copy",
-    "q_cleanup_transport_1_start", "q_cleanup_place_1", "q_cleanup_place_S",
-    "q_cleanup_return_to_source", "q_cleanup_erase_rest", "q_cleanup_finish"
+    "q_cleanup_init", "q_cleanup_find_end", "q_cleanup_restore_last_block", "q_cleanup_erase_left_loop"
   ],
   "transiciones": [
     {"estado_actual": "q0", "simbolo_leido": "B", "estado_siguiente": "q_accept", "simbolo_escrito": "B", "movimiento": "R"},
