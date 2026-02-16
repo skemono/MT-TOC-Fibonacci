@@ -60,17 +60,37 @@ class MaquinaTuring:
         return unos, pasos
 
 if __name__ == "__main__":
+    import os
+    
+    archivo_mt = "maquina_fibonacci.json"
+    
+    # Permitir pasar el archivo JSON como primer argumento
+    if len(sys.argv) > 1 and sys.argv[1].endswith('.json'):
+        archivo_mt = sys.argv[1]
+        # Eliminamos el argumento para no confundir con la entrada si se pasa después
+        sys.argv.pop(1)
+    elif len(sys.argv) == 1:
+         # Si no hay argumentos, preguntar al usuario (o usar default si enter)
+        entrada_usuario = input(f"Ingrese archivo de configuración [{archivo_mt}]: ").strip()
+        if entrada_usuario:
+            archivo_mt = entrada_usuario
+
+    if not os.path.exists(archivo_mt):
+        print(f"Error: El archivo '{archivo_mt}' no existe.")
+        sys.exit(1)
+
+    mt = MaquinaTuring(archivo_mt)
+    print(f"Cargada máquina: {archivo_mt}")
+
     if len(sys.argv) > 1:
-        # Modo archivo
-        mt = MaquinaTuring('maquina_fibonacci.json')
+        # Modo archivo (argumento restante es la entrada)
         res, pasos = mt.ejecutar(sys.argv[1], mostrar_configs=True)
         print(f"Entrada: {len(sys.argv[1])}, Salida: {res} (Pasos: {pasos})")
     else:
         # Modo interactivo
-        print("Simulador MT Fibonacci")
+        print("Simulador MT")
         entrada = input("Ingrese entrada en unario (ej. 111): ")
-        mt = MaquinaTuring('maquina_fibonacci.json')
         print("\nConfiguraciones:")
         res, pasos = mt.ejecutar(entrada, mostrar_configs=True)
-        print(f"\nResultado F({len(entrada)}) = {res}")
+        print(f"\nResultado (bloque más grande de 1s) = {res}")
         print(f"Pasos totales: {pasos}")
